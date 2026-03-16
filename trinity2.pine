@@ -671,20 +671,26 @@ if not na(ts_obTop) and not na(ts_swingLo) and ts_swingLo < ts_obTop
     _rng       = ts_obTop - ts_swingLo
     ote_sel_lo := ts_swingLo + _rng * ote_fib1
     ote_sel_hi := ts_swingLo + _rng * ote_fib2
-if not na(ote_buy_lo) and not na(ote_buy_hi) and per
+if not na(ote_buy_lo) and not na(ote_buy_hi) and per and MSS.dir == 1
     if na(tl_oteBox)
         tl_oteBox := box.new(bar_index-50, ote_buy_hi, bar_index+20, ote_buy_lo, bgcolor=cOTEbull, border_color=color.new(#00e676,40), text='OTE', text_size=size.tiny)
     else
         tl_oteBox.set_top(ote_buy_hi)
         tl_oteBox.set_bottom(ote_buy_lo)
         tl_oteBox.set_right(bar_index+20)
-if not na(ote_sel_lo) and not na(ote_sel_hi) and per
+else if MSS.dir == -1 and not na(tl_oteBox)
+    tl_oteBox.delete()
+    tl_oteBox := na
+if not na(ote_sel_lo) and not na(ote_sel_hi) and per and MSS.dir == -1
     if na(ts_oteBox)
         ts_oteBox := box.new(bar_index-50, ote_sel_hi, bar_index+20, ote_sel_lo, bgcolor=cOTEbear, border_color=color.new(#ff5252,40), text='OTE', text_size=size.tiny)
     else
         ts_oteBox.set_top(ote_sel_hi)
         ts_oteBox.set_bottom(ote_sel_lo)
         ts_oteBox.set_right(bar_index+20)
+else if MSS.dir == 1 and not na(ts_oteBox)
+    ts_oteBox.delete()
+    ts_oteBox := na
 //-----------------------------------------------------------------------------}
 // TRINITY SIGNAL
 //-----------------------------------------------------------------------------{
