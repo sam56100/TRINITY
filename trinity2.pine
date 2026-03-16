@@ -633,7 +633,7 @@ if bearish_ob.size() > 0
             _bear_top := o.top
             _bear_loc := o.loc
             break
-if _bull_loc != tl_obLoc
+if not na(_bull_loc) and (na(tl_obLoc) or _bull_loc != tl_obLoc)
     tl_obLoc   := _bull_loc
     tl_obBtm   := _bull_btm
     tl_obTop   := _bull_top
@@ -644,7 +644,7 @@ if _bull_loc != tl_obLoc
     if not na(tl_oteBox)
         tl_oteBox.delete()
         tl_oteBox := na
-if _bear_loc != ts_obLoc
+if not na(_bear_loc) and (na(ts_obLoc) or _bear_loc != ts_obLoc)
     ts_obLoc   := _bear_loc
     ts_obBtm   := _bear_btm
     ts_obTop   := _bear_top
