@@ -672,22 +672,28 @@ if not na(ts_obTop) and not na(ts_swingLo) and ts_swingLo < ts_obTop
     ote_sel_lo := ts_swingLo + _rng * ote_fib1
     ote_sel_hi := ts_swingLo + _rng * ote_fib2
 if not na(ote_buy_lo) and not na(ote_buy_hi) and per and MSS.dir == 1
+    _left = na(tl_obLoc) ? time : tl_obLoc
+    _right = timenow + tf_msec * 20
     if na(tl_oteBox)
-        tl_oteBox := box.new(bar_index-50, ote_buy_hi, bar_index+20, ote_buy_lo, bgcolor=cOTEbull, border_color=color.new(#00e676,40), text='OTE', text_size=size.tiny)
+        tl_oteBox := box.new(_left, ote_buy_hi, _right, ote_buy_lo, bgcolor=cOTEbull, border_color=color.new(#00e676,40), text='OTE', text_size=size.tiny, xloc=xloc.bar_time)
     else
+        tl_oteBox.set_left(_left)
         tl_oteBox.set_top(ote_buy_hi)
         tl_oteBox.set_bottom(ote_buy_lo)
-        tl_oteBox.set_right(bar_index+20)
+        tl_oteBox.set_right(_right)
 else if MSS.dir == -1 and not na(tl_oteBox)
     tl_oteBox.delete()
     tl_oteBox := na
 if not na(ote_sel_lo) and not na(ote_sel_hi) and per and MSS.dir == -1
+    _left = na(ts_obLoc) ? time : ts_obLoc
+    _right = timenow + tf_msec * 20
     if na(ts_oteBox)
-        ts_oteBox := box.new(bar_index-50, ote_sel_hi, bar_index+20, ote_sel_lo, bgcolor=cOTEbear, border_color=color.new(#ff5252,40), text='OTE', text_size=size.tiny)
+        ts_oteBox := box.new(_left, ote_sel_hi, _right, ote_sel_lo, bgcolor=cOTEbear, border_color=color.new(#ff5252,40), text='OTE', text_size=size.tiny, xloc=xloc.bar_time)
     else
+        ts_oteBox.set_left(_left)
         ts_oteBox.set_top(ote_sel_hi)
         ts_oteBox.set_bottom(ote_sel_lo)
-        ts_oteBox.set_right(bar_index+20)
+        ts_oteBox.set_right(_right)
 else if MSS.dir == 1 and not na(ts_oteBox)
     ts_oteBox.delete()
     ts_oteBox := na
