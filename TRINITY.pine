@@ -730,8 +730,8 @@ else if not na(ts_oteBox)
 //-----------------------------------------------------------------------------{
 priceInOTE_buy  = not na(ote_buy_lo) and inRange(close, ote_buy_lo, ote_buy_hi)
 priceInOTE_sell = not na(ote_sel_lo) and inRange(close, ote_sel_lo, ote_sel_hi)
-fvgInOTE_buy    = bFVG_UP.size() > 0 and not na(ote_buy_lo) and fvgInOTE(bFVG_UP, ote_buy_lo, ote_buy_hi)
-fvgInOTE_sell   = bFVG_DN.size() > 0 and not na(ote_sel_lo) and fvgInOTE(bFVG_DN, ote_sel_lo, ote_sel_hi)
+fvgInOTE_buy    = bFVG_UP.size() > 0 and bFVG_UP.get(0).active
+fvgInOTE_sell   = bFVG_DN.size() > 0 and bFVG_DN.get(0).active
 bool tri_long_raw  = tl_mssOk and not na(tl_obLoc) and priceInOTE_buy  and fvgInOTE_buy
 bool tri_short_raw = ts_mssOk and not na(ts_obLoc) and priceInOTE_sell and fvgInOTE_sell
 bool tri_long  = tri_close ? (tri_long_raw  and barstate.isconfirmed) : tri_long_raw
