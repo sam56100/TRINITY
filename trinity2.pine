@@ -242,7 +242,7 @@ draw(left, col) =>
     x2  := bar_index - 1
     ph   = ta.pivothigh(hi, left, 1)
     pl   = ta.pivotlow (lo, left, 1)
-    if ph
+    if not na(ph)
         dir := aZZ.d.get(0), x1 := aZZ.x.get(0), y1 := aZZ.y.get(0), y2 := nz(hi[1])
         if dir < 1
             aZZ.in_out(1, x1, y1, x2, y2, col, true)
@@ -310,7 +310,7 @@ draw(left, col) =>
             if not iMSS
                 MSS.l_mssBl.get(0).set_color(color(na)), MSS.lbMssBl.get(0).set_textcolor(color(na))
                 MSS.l_mssBr.get(0).set_color(color(na)), MSS.lbMssBr.get(0).set_textcolor(color(na))
-    if pl
+    if not na(pl)
         dir := aZZ.d.get(0), x1 := aZZ.x.get(0), y1 := aZZ.y.get(0), y2 := nz(lo[1])
         if dir > -1
             aZZ.in_out(-1, x1, y1, x2, y2, col, true)
