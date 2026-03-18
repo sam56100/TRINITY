@@ -270,7 +270,9 @@ draw(left, col) =>
                 else
                     b_liq_B.unshift(liq.new(box.new(st_B, math.avg(minP, maxP) + (atr/a), n + 10, math.avg(minP, maxP) - (atr/a), text='Buyside liquidity', text_size=size.tiny, text_halign=text.align_left, text_valign=text.align_bottom, text_color=color.new(cLIQ_B, 25), bgcolor=color(na), border_color=color(na)), false, false, false, line.new(st_B, st_P, n - 1, st_P, color=color.new(cLIQ_B, 0))))
                     if b_liq_B.size() > visLiq
-                        getLast = b_liq_B.pop(), getLast.bx.delete(), getLast.ln.delete()
+                        getLast = b_liq_B.pop()
+                        getLast.bx.delete()
+                        getLast.ln.delete()
         if showMS
             iH = aZZ.d.get(2) == 1 ? 2 : 1
             iL = aZZ.d.get(2) == -1 ? 2 : 1
@@ -338,7 +340,9 @@ draw(left, col) =>
                 else
                     b_liq_S.unshift(liq.new(box.new(st_B, math.avg(minP, maxP) + (atr/a), n + 10, math.avg(minP, maxP) - (atr/a), text='Sellside liquidity', text_size=size.tiny, text_halign=text.align_left, text_valign=text.align_bottom, text_color=color.new(cLIQ_S, 25), bgcolor=color(na), border_color=color(na)), false, false, false, line.new(st_B, st_P, n - 1, st_P, color=color.new(cLIQ_S, 0))))
                     if b_liq_S.size() > visLiq
-                        getLast = b_liq_S.pop(), getLast.bx.delete(), getLast.ln.delete()
+                        getLast = b_liq_S.pop()
+                        getLast.bx.delete()
+                        getLast.ln.delete()
         if showMS
             iH = aZZ.d.get(2) == 1 ? 2 : 1
             iL = aZZ.d.get(2) == -1 ? 2 : 1
@@ -380,9 +384,11 @@ draw(left, col) =>
                 MSS.l_mssBr.get(0).set_color(color(na)), MSS.lbMssBr.get(0).set_textcolor(color(na))
 draw(len, color.yellow)
 if MSS.l_bosBl.size() > 200
-    MSS.l_bosBl.pop().delete(), MSS.lbBosBl.pop().delete()
+    MSS.l_bosBl.pop().delete()
+    MSS.lbBosBl.pop().delete()
 if MSS.l_bosBr.size() > 200
-    MSS.l_bosBr.pop().delete(), MSS.lbBosBr.pop().delete()
+    MSS.l_bosBr.pop().delete()
+    MSS.lbBosBr.pop().delete()
 ny        = (not na(time(timeframe.period, input.session('0700-0900', '', inline='ny', group='Killzones'), 'America/New_York'))) and showNy
 ldn_open  = (not na(time(timeframe.period, input.session('0700-1000', '', inline='lo', group='Killzones'), 'Europe/London')))    and showLdno
 ldn_close = (not na(time(timeframe.period, input.session('1500-1700', '', inline='lc', group='Killzones'), 'Europe/London')))    and showLdnc
@@ -406,7 +412,10 @@ if sVimbl
     if vImb_Br
         Vimbal.unshift(_2ln_lb.new(line.new(n-1, mn[1], n+3, mn[1], color=cVimbl), line.new(n, mx, n+3, mx, color=cVimbl), label.new(n+3, math.avg(mn[1], mx), text='VI', color=color(na), textcolor=cVimbl, style=label.style_label_left)))
     if Vimbal.size() > visVim
-        pop = Vimbal.pop(), pop.l1.delete(), pop.l2.delete(), pop.lb.delete()
+        pop = Vimbal.pop()
+        pop.l1.delete()
+        pop.l2.delete()
+        pop.lb.delete()
 if barstate.isfirst
     for i = 0 to visBxs - 1
         bFVG_UP.unshift(FVG.new(box(na), false))
@@ -464,11 +473,15 @@ if newDay
     if dayofweek == dayofweek.monday and iNWOG
         monOp := open, monOi := n
         bl_NWOG.unshift(bx_ln.new(box.new(friCi, math.max(friCp,monOp), monOi, math.min(friCp,monOp), bgcolor=color(na), border_color=cNWOG2, extend=extend.right), line.new(monOi, math.avg(friCp,monOp), monOi+1, math.avg(friCp,monOp), color=cNWOG1, style=line.style_dotted, extend=extend.right)))
-        bl = bl_NWOG.pop(), bl.b.delete(), bl.l.delete()
+        bl = bl_NWOG.pop()
+        bl.b.delete()
+        bl.l.delete()
     if iNDOG
         cuDOp := open, cuDOi := n, prDCp := close[1], prDCi := n-1
         bl_NDOG.unshift(bx_ln.new(box.new(prDCi, math.max(prDCp,cuDOp), cuDOi, math.min(prDCp,cuDOp), bgcolor=color(na), border_color=cNDOG2, extend=extend.right), line.new(cuDOi, math.avg(prDCp,cuDOp), cuDOi+1, math.avg(prDCp,cuDOp), color=cNDOG1, style=line.style_dotted, extend=extend.right)))
-        bl = bl_NDOG.pop(), bl.b.delete(), bl.l.delete()
+        bl = bl_NDOG.pop()
+        bl.b.delete()
+        bl.l.delete()
 for i = 0 to b_liq_B.size()-1
     x = b_liq_B.get(i)
     if not x.broken
@@ -546,7 +559,9 @@ if barstate.islast and showOB
     if a_bx_ln_lb.size() > 0
         for i = a_bx_ln_lb.size()-1 to 0
             item = a_bx_ln_lb.remove(i)
-            item.bx.delete(), item.ln.delete(), item.lb.delete()
+            item.bx.delete()
+            item.ln.delete()
+            item.lb.delete()
     if showBull > 0 and bullish_ob.size() > 0
         for i = 0 to math.min(showBull, bullish_ob.size())-1
             bullish_ob.get(i).display(bullCss, bullBrkCss, 'bl')
