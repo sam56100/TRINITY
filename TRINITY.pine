@@ -193,9 +193,6 @@ var float ote_buy_hi = na
 var float ote_sel_lo = na
 var float ote_sel_hi = na
 var int   prevMSSdir = 0
-// Signal deduplication — FIX #4
-var bool  tri_long_fired  = false
-var bool  tri_short_fired = false
 //-----------------------------------------------------------------------------}
 // METHODS
 //-----------------------------------------------------------------------------{
@@ -609,8 +606,6 @@ if mssFlippedBull
     if not na(ts_oteBox)
         ts_oteBox.delete()
         ts_oteBox := na
-    // FIX #4 : reset signal dedup on MSS flip
-    tri_short_fired := false
 if mssFlippedBear
     ote_buy_lo := na
     ote_buy_hi := na
@@ -622,8 +617,6 @@ if mssFlippedBear
     if not na(tl_oteBox)
         tl_oteBox.delete()
         tl_oteBox := na
-    // FIX #4 : reset signal dedup on MSS flip
-    tri_long_fired := false
 prevMSSdir := MSS.dir
 float activeBullOB_btm = na
 float activeBullOB_top = na
@@ -658,8 +651,6 @@ if not na(activeBullOB_loc) and (na(tl_obLoc) or activeBullOB_loc != tl_obLoc)
     if not na(tl_oteBox)
         tl_oteBox.delete()
         tl_oteBox := na
-    // FIX #4 : reset on new OB
-    tri_long_fired := false
 if na(activeBullOB_loc) and not na(tl_obLoc)
     tl_obLoc   := na
     tl_obBtm   := na
@@ -682,8 +673,6 @@ if not na(activeBearOB_loc) and (na(ts_obLoc) or activeBearOB_loc != ts_obLoc)
     if not na(ts_oteBox)
         ts_oteBox.delete()
         ts_oteBox := na
-    // FIX #4 : reset on new OB
-    tri_short_fired := false
 if na(activeBearOB_loc) and not na(ts_obLoc)
     ts_obLoc   := na
     ts_obBtm   := na
@@ -708,127 +697,45 @@ if not na(ts_obTop) and not na(ts_swingLo) and ts_swingLo < ts_obTop
     ote_sel_lo := ts_swingLo + _rng * ote_fib1
     ote_sel_hi := ts_swingLo + _rng * ote_fib2
 //-----------------------------------------------------------------------------}
-// MTF PRIORITY — FIX #5 : skip duplicate request.security when TFs are identical
+// OTE BOX DISPLAY
 //-----------------------------------------------------------------------------{
-tf_secs  = timeframe.in_seconds(timeframe.period)
-string ref_tf1 = timeframe.period
-string ref_tf2 = timeframe.period
-if tf_secs <= 60
-    ref_tf1 := "1",   ref_tf2 := "1"
-else if tf_secs <= 180
-    ref_tf1 := "1",   ref_tf2 := "3"
-else if tf_secs <= 300
-    ref_tf1 := "3",   ref_tf2 := "5"
-else if tf_secs <= 900
-    ref_tf1 := "5",   ref_tf2 := "15"
-else if tf_secs <= 1800
-    ref_tf1 := "5",   ref_tf2 := "15"
-else if tf_secs <= 3600
-    ref_tf1 := "15",  ref_tf2 := "30"
-else
-    ref_tf1 := "60",  ref_tf2 := "240"
-bool use_mtf = ref_tf1 != ref_tf2
-[r1_buy_lo, r1_buy_hi, r1_sel_lo, r1_sel_hi, r1_bull_on, r1_bear_on, r1_bull_loc, r1_bear_loc] = request.security(syminfo.tickerid, ref_tf1,
-        [ote_buy_lo, ote_buy_hi, ote_sel_lo, ote_sel_hi,
-        tl_mssOk and not na(tl_obLoc) and not na(ote_buy_lo),
-        ts_mssOk and not na(ts_obLoc) and not na(ote_sel_lo),
-        tl_obLoc, ts_obLoc],
-        lookahead=barmerge.lookahead_off)
-float r2_buy_lo   = na
-float r2_buy_hi   = na
-float r2_sel_lo   = na
-float r2_sel_hi   = na
-bool  r2_bull_on  = false
-bool  r2_bear_on  = false
-int   r2_bull_loc = na
-int   r2_bear_loc = na
-if use_mtf
-    [r2_buy_lo, r2_buy_hi, r2_sel_lo, r2_sel_hi, r2_bull_on, r2_bear_on, r2_bull_loc, r2_bear_loc] := request.security(syminfo.tickerid, ref_tf2,
-            [ote_buy_lo, ote_buy_hi, ote_sel_lo, ote_sel_hi,
-            tl_mssOk and not na(tl_obLoc) and not na(ote_buy_lo),
-            ts_mssOk and not na(ts_obLoc) and not na(ote_sel_lo),
-            tl_obLoc, ts_obLoc],
-            lookahead=barmerge.lookahead_off)
-else
-    r2_buy_lo   := r1_buy_lo
-    r2_buy_hi   := r1_buy_hi
-    r2_sel_lo   := r1_sel_lo
-    r2_sel_hi   := r1_sel_hi
-    r2_bull_on  := r1_bull_on
-    r2_bear_on  := r1_bear_on
-    r2_bull_loc := r1_bull_loc
-    r2_bear_loc := r1_bear_loc
-float prio_buy_lo  = na
-float prio_buy_hi  = na
-bool  prio_bull_on = false
-int   prio_bull_loc = na
-float prio_sel_lo  = na
-float prio_sel_hi  = na
-bool  prio_bear_on = false
-int   prio_bear_loc = na
-if r1_bull_on
-    prio_buy_lo   := r1_buy_lo,  prio_buy_hi   := r1_buy_hi
-    prio_bull_on  := true,       prio_bull_loc := nz(r1_bull_loc, time)
-else if use_mtf and r2_bull_on
-    prio_buy_lo   := r2_buy_lo,  prio_buy_hi   := r2_buy_hi
-    prio_bull_on  := true,       prio_bull_loc := nz(r2_bull_loc, time)
-else if tl_mssOk and not na(tl_obLoc) and not na(ote_buy_lo)
-    prio_buy_lo   := ote_buy_lo, prio_buy_hi   := ote_buy_hi
-    prio_bull_on  := true,       prio_bull_loc := tl_obLoc
-if r1_bear_on
-    prio_sel_lo   := r1_sel_lo,  prio_sel_hi   := r1_sel_hi
-    prio_bear_on  := true,       prio_bear_loc := nz(r1_bear_loc, time)
-else if use_mtf and r2_bear_on
-    prio_sel_lo   := r2_sel_lo,  prio_sel_hi   := r2_sel_hi
-    prio_bear_on  := true,       prio_bear_loc := nz(r2_bear_loc, time)
-else if ts_mssOk and not na(ts_obLoc) and not na(ote_sel_lo)
-    prio_sel_lo   := ote_sel_lo, prio_sel_hi   := ote_sel_hi
-    prio_bear_on  := true,       prio_bear_loc := ts_obLoc
-if prio_bull_on and not na(prio_buy_lo) and not na(prio_buy_hi) and per
-    _left  = nz(prio_bull_loc, time)
+if not na(ote_buy_lo) and not na(ote_buy_hi) and per and MSS.dir == 1
+    _left  = na(tl_obLoc) ? time : tl_obLoc
     _right = timenow + tf_msec * 20
     if na(tl_oteBox)
-        tl_oteBox := box.new(_left, prio_buy_hi, _right, prio_buy_lo, bgcolor=cOTEbull, border_color=color.new(#00e676,40), text='OTE', text_size=size.tiny, xloc=xloc.bar_time)
+        tl_oteBox := box.new(_left, ote_buy_hi, _right, ote_buy_lo, bgcolor=cOTEbull, border_color=color.new(#00e676,40), text='OTE', text_size=size.tiny, xloc=xloc.bar_time)
     else
         tl_oteBox.set_left(_left)
-        tl_oteBox.set_top(prio_buy_hi)
-        tl_oteBox.set_bottom(prio_buy_lo)
+        tl_oteBox.set_top(ote_buy_hi)
+        tl_oteBox.set_bottom(ote_buy_lo)
         tl_oteBox.set_right(_right)
 else if not na(tl_oteBox)
     tl_oteBox.delete()
     tl_oteBox := na
-if prio_bear_on and not na(prio_sel_lo) and not na(prio_sel_hi) and per
-    _left  = nz(prio_bear_loc, time)
+if not na(ote_sel_lo) and not na(ote_sel_hi) and per and MSS.dir == -1
+    _left  = na(ts_obLoc) ? time : ts_obLoc
     _right = timenow + tf_msec * 20
     if na(ts_oteBox)
-        ts_oteBox := box.new(_left, prio_sel_hi, _right, prio_sel_lo, bgcolor=cOTEbear, border_color=color.new(#ff5252,40), text='OTE', text_size=size.tiny, xloc=xloc.bar_time)
+        ts_oteBox := box.new(_left, ote_sel_hi, _right, ote_sel_lo, bgcolor=cOTEbear, border_color=color.new(#ff5252,40), text='OTE', text_size=size.tiny, xloc=xloc.bar_time)
     else
         ts_oteBox.set_left(_left)
-        ts_oteBox.set_top(prio_sel_hi)
-        ts_oteBox.set_bottom(prio_sel_lo)
+        ts_oteBox.set_top(ote_sel_hi)
+        ts_oteBox.set_bottom(ote_sel_lo)
         ts_oteBox.set_right(_right)
 else if not na(ts_oteBox)
     ts_oteBox.delete()
     ts_oteBox := na
 //-----------------------------------------------------------------------------}
-// TRINITY SIGNAL — FIX #4 : signal deduplication (1 signal per setup)
+// TRINITY SIGNAL
 //-----------------------------------------------------------------------------{
-priceInOTE_buy  = prio_bull_on and inRange(close, prio_buy_lo, prio_buy_hi)
-priceInOTE_sell = prio_bear_on and inRange(close, prio_sel_lo, prio_sel_hi)
-fvgInOTE_buy    = bFVG_UP.size() > 0 and prio_bull_on and fvgInOTE(bFVG_UP, prio_buy_lo, prio_buy_hi)
-fvgInOTE_sell   = bFVG_DN.size() > 0 and prio_bear_on and fvgInOTE(bFVG_DN, prio_sel_lo, prio_sel_hi)
-bool tri_long_raw  = prio_bull_on and priceInOTE_buy  and fvgInOTE_buy
-bool tri_short_raw = prio_bear_on and priceInOTE_sell and fvgInOTE_sell
-// Apply close-only filter
-bool tri_long_conf  = tri_close ? (tri_long_raw  and barstate.isconfirmed) : tri_long_raw
-bool tri_short_conf = tri_close ? (tri_short_raw and barstate.isconfirmed) : tri_short_raw
-// Deduplicated : fire once per setup, reset on MSS flip or new OB
-bool tri_long  = tri_long_conf  and not tri_long_fired
-bool tri_short = tri_short_conf and not tri_short_fired
-if tri_long
-    tri_long_fired := true
-if tri_short
-    tri_short_fired := true
+priceInOTE_buy  = not na(ote_buy_lo) and inRange(close, ote_buy_lo, ote_buy_hi)
+priceInOTE_sell = not na(ote_sel_lo) and inRange(close, ote_sel_lo, ote_sel_hi)
+fvgInOTE_buy    = bFVG_UP.size() > 0 and not na(ote_buy_lo) and fvgInOTE(bFVG_UP, ote_buy_lo, ote_buy_hi)
+fvgInOTE_sell   = bFVG_DN.size() > 0 and not na(ote_sel_lo) and fvgInOTE(bFVG_DN, ote_sel_lo, ote_sel_hi)
+bool tri_long_raw  = tl_mssOk and not na(tl_obLoc) and priceInOTE_buy  and fvgInOTE_buy
+bool tri_short_raw = ts_mssOk and not na(ts_obLoc) and priceInOTE_sell and fvgInOTE_sell
+bool tri_long  = tri_close ? (tri_long_raw  and barstate.isconfirmed) : tri_long_raw
+bool tri_short = tri_close ? (tri_short_raw and barstate.isconfirmed) : tri_short_raw
 plotshape(tri_long,  title='TRINITY Long',  style=shape.triangleup,   size=size.small, location=location.belowbar, color=color.new(color.lime,0), text='TL')
 plotshape(tri_short, title='TRINITY Short', style=shape.triangledown, size=size.small, location=location.abovebar, color=color.new(color.red, 0), text='TS')
 alertcondition(tri_long,  'TRINITY Long',  message='{"type":"TRINITY_LONG","symbol":"{{ticker}}","tf":"{{interval}}","price":"{{close}}"}')
