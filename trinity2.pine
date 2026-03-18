@@ -160,7 +160,7 @@ var FVG[]  bFVG_UP     = array.new<FVG>()
 var FVG[]  bFVG_DN     = array.new<FVG>()
 var FVG[]  bBPR_UP     = array.new<FVG>()
 var FVG[]  bBPR_DN     = array.new<FVG>()
-var ZZ     aZZ         = ZZ.new(array.new<int>(maxSize, 0), array.new<int>(maxSize, 0), array.new<float>(maxSize, na), array.new<bool>(maxSize, na))
+var ZZ     aZZ         = ZZ.new(array.new<int>(maxSize, 0), array.new<int>(maxSize, 0), array.new<float>(maxSize, na), array.new<bool>(maxSize, false))
 var float friCp = na, var int friCi = na
 var float monOp = na, var int monOi = na
 var float prDCp = na, var int prDCi = na
