@@ -1,6 +1,6 @@
 // This Pine Script® code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
 // © SAMANYFX / © LuxAlgo
-//@version=5
+//@version=6
 indicator("TRINITY 2.0", overlay=true, max_lines_count=500, max_boxes_count=500, max_labels_count=500, max_bars_back=3000)
 o          = 'Options'
 sp1        = '       '
@@ -660,11 +660,11 @@ int   activeBullOB_loc = na
 
 if MSS.dir == 1 and bullish_ob.size() > 0
     for i = 0 to bullish_ob.size()-1
-        o = bullish_ob.get(i)
-        if not o.breaker
-            activeBullOB_btm := o.btm
-            activeBullOB_top := o.top
-            activeBullOB_loc := o.loc
+        ob_item = bullish_ob.get(i)
+        if not ob_item.breaker
+            activeBullOB_btm := ob_item.btm
+            activeBullOB_top := ob_item.top
+            activeBullOB_loc := ob_item.loc
             break   // most recent valid bull OB only
 
 float activeBearOB_btm = na
@@ -673,11 +673,11 @@ int   activeBearOB_loc = na
 
 if MSS.dir == -1 and bearish_ob.size() > 0
     for i = 0 to bearish_ob.size()-1
-        o = bearish_ob.get(i)
-        if not o.breaker
-            activeBearOB_btm := o.btm
-            activeBearOB_top := o.top
-            activeBearOB_loc := o.loc
+        ob_item = bearish_ob.get(i)
+        if not ob_item.breaker
+            activeBearOB_btm := ob_item.btm
+            activeBearOB_top := ob_item.top
+            activeBearOB_loc := ob_item.loc
             break   // most recent valid bear OB only
 
 // ── Sync persistent state with active OB ──────────────────────────────────────
@@ -778,16 +778,14 @@ else                      // H4+ → H1 > H4
     ref_tf1 := "60",  ref_tf2 := "240"
 
 // Pull OTE values + active-OB flags + OB timestamps from the two reference TFs
-[r1_buy_lo, r1_buy_hi, r1_sel_lo, r1_sel_hi, r1_bull_on, r1_bear_on, r1_bull_loc, r1_bear_loc] =
-    request.security(syminfo.tickerid, ref_tf1,
+[r1_buy_lo, r1_buy_hi, r1_sel_lo, r1_sel_hi, r1_bull_on, r1_bear_on, r1_bull_loc, r1_bear_loc] = request.security(syminfo.tickerid, ref_tf1,
         [ote_buy_lo, ote_buy_hi, ote_sel_lo, ote_sel_hi,
          tl_mssOk and not na(tl_obLoc) and not na(ote_buy_lo),
          ts_mssOk and not na(ts_obLoc) and not na(ote_sel_lo),
          tl_obLoc, ts_obLoc],
         lookahead=barmerge.lookahead_off)
 
-[r2_buy_lo, r2_buy_hi, r2_sel_lo, r2_sel_hi, r2_bull_on, r2_bear_on, r2_bull_loc, r2_bear_loc] =
-    request.security(syminfo.tickerid, ref_tf2,
+[r2_buy_lo, r2_buy_hi, r2_sel_lo, r2_sel_hi, r2_bull_on, r2_bear_on, r2_bull_loc, r2_bear_loc] = request.security(syminfo.tickerid, ref_tf2,
         [ote_buy_lo, ote_buy_hi, ote_sel_lo, ote_sel_hi,
          tl_mssOk and not na(tl_obLoc) and not na(ote_buy_lo),
          ts_mssOk and not na(ts_obLoc) and not na(ote_sel_lo),
