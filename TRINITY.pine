@@ -742,21 +742,29 @@ var bool  r2_bull_on  = false
 var bool  r2_bear_on  = false
 var int   r2_bull_loc = na
 var int   r2_bear_loc = na
+float _tmp_a = na
+float _tmp_b = na
+float _tmp_c = na
+float _tmp_d = na
+bool  _tmp_e = false
+bool  _tmp_f = false
+int   _tmp_g = na
+int   _tmp_h = na
 if use_mtf
-    [float _a, float _b, float _c, float _d, bool _e, bool _f, int _g, int _h] = request.security(syminfo.tickerid, ref_tf2,
+    [_tmp_a, _tmp_b, _tmp_c, _tmp_d, _tmp_e, _tmp_f, _tmp_g, _tmp_h] = request.security(syminfo.tickerid, ref_tf2,
             [ote_buy_lo, ote_buy_hi, ote_sel_lo, ote_sel_hi,
             tl_mssOk and not na(tl_obLoc) and not na(ote_buy_lo),
             ts_mssOk and not na(ts_obLoc) and not na(ote_sel_lo),
             tl_obLoc, ts_obLoc],
             lookahead=barmerge.lookahead_off)
-    r2_buy_lo   := _a
-    r2_buy_hi   := _b
-    r2_sel_lo   := _c
-    r2_sel_hi   := _d
-    r2_bull_on  := _e
-    r2_bear_on  := _f
-    r2_bull_loc := _g
-    r2_bear_loc := _h
+    r2_buy_lo   := _tmp_a
+    r2_buy_hi   := _tmp_b
+    r2_sel_lo   := _tmp_c
+    r2_sel_hi   := _tmp_d
+    r2_bull_on  := _tmp_e
+    r2_bear_on  := _tmp_f
+    r2_bull_loc := _tmp_g
+    r2_bear_loc := _tmp_h
 else
     r2_buy_lo   := r1_buy_lo
     r2_buy_hi   := r1_buy_hi
