@@ -606,8 +606,6 @@ if mssFlippedBull
     if not na(ts_oteBox)
         ts_oteBox.delete()
         ts_oteBox := na
-    // FIX #4 : reset signal dedup on MSS flip
-    tri_short_fired := false
 if mssFlippedBear
     ote_buy_lo := na
     ote_buy_hi := na
@@ -619,8 +617,6 @@ if mssFlippedBear
     if not na(tl_oteBox)
         tl_oteBox.delete()
         tl_oteBox := na
-    // FIX #4 : reset signal dedup on MSS flip
-    tri_long_fired := false
 prevMSSdir := MSS.dir
 float activeBullOB_btm = na
 float activeBullOB_top = na
@@ -655,8 +651,6 @@ if not na(activeBullOB_loc) and (na(tl_obLoc) or activeBullOB_loc != tl_obLoc)
     if not na(tl_oteBox)
         tl_oteBox.delete()
         tl_oteBox := na
-    // FIX #4 : reset on new OB
-    tri_long_fired := false
 if na(activeBullOB_loc) and not na(tl_obLoc)
     tl_obLoc   := na
     tl_obBtm   := na
@@ -679,8 +673,6 @@ if not na(activeBearOB_loc) and (na(ts_obLoc) or activeBearOB_loc != ts_obLoc)
     if not na(ts_oteBox)
         ts_oteBox.delete()
         ts_oteBox := na
-    // FIX #4 : reset on new OB
-    tri_short_fired := false
 if na(activeBearOB_loc) and not na(ts_obLoc)
     ts_obLoc   := na
     ts_obBtm   := na
