@@ -752,9 +752,10 @@ bool tri_short = tri_close ? (tri_short_raw and barstate.isconfirmed) : tri_shor
 
 if tri_long
     tl_fired := true
+    alert('TRINITY LONG | ' + syminfo.ticker + ' | ' + timeframe.period + 'min | Prix: ' + str.tostring(close), alert.freq_once_per_bar)
 if tri_short
     ts_fired := true
+    alert('TRINITY SHORT | ' + syminfo.ticker + ' | ' + timeframe.period + 'min | Prix: ' + str.tostring(close), alert.freq_once_per_bar)
 plotshape(tri_long,  title='TRINITY Long',  style=shape.triangleup,   size=size.small, location=location.belowbar, color=color.new(color.lime,0), text='TL')
 plotshape(tri_short, title='TRINITY Short', style=shape.triangledown, size=size.small, location=location.abovebar, color=color.new(color.red, 0), text='TS')
-alertcondition(tri_long,  'TRINITY Long',  message='{"type":"TRINITY_LONG","symbol":"{{ticker}}","tf":"{{interval}}","price":"{{close}}"}')
-alertcondition(tri_short, 'TRINITY Short', message='{"type":"TRINITY_SHORT","symbol":"{{ticker}}","tf":"{{interval}}","price":"{{close}}"}')
+alertcondition(tri_long or tri_short, 'TRINITY Signal', message='TRINITY SIGNAL')
