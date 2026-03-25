@@ -728,19 +728,36 @@ else if not na(ts_oteBox)
 //-----------------------------------------------------------------------------}
 // TRINITY SIGNAL
 //-----------------------------------------------------------------------------{
-var bool tl_fired = false
-var bool ts_fired = false
+var bool  tl_fired     = false
+var bool  ts_fired     = false
+var int   tl_signal_ob = na   // OB qui a déclenché le dernier TL
+var int   ts_signal_ob = na   // OB qui a déclenché le dernier TS
+var label tl_lbl       = na   // label unique TL (1 seul sur le chart)
+var label ts_lbl       = na   // label unique TS (1 seul sur le chart)
 
-// Reset uniquement au flip du MSS — un seul signal par phase directionnelle
+// Reset sur flip MSS + effacement du label de l'autre côté
 if mssFlippedBear
-    tl_fired := false
+    tl_fired     := false
+    tl_signal_ob := na
+    if not na(ts_lbl)
+        ts_lbl.delete()
+        ts_lbl := na
 if mssFlippedBull
+    ts_fired     := false
+    ts_signal_ob := na
+    if not na(tl_lbl)
+        tl_lbl.delete()
+        tl_lbl := na
+
+// Reset si l'OB actif a changé depuis le dernier signal (nouveau setup)
+if tl_fired and not na(tl_signal_ob) and tl_obLoc != tl_signal_ob
+    tl_fired := false
+if ts_fired and not na(ts_signal_ob) and ts_obLoc != ts_signal_ob
     ts_fired := false
 
-// Signal déclenché dès que le setup est structurellement complet :
-// OB détecté + MSS dans la même direction + FVG dans la zone OTE calculée
+// Signal : OB détecté + MSS aligné + FVG dans la zone OTE calculée
 // Le prix N'A PAS besoin d'entrer dans l'OTE
-fvgInOTE_buy  = not na(ote_buy_lo)  and fvgInOTE(bFVG_UP, ote_buy_lo,  ote_buy_hi)
+fvgInOTE_buy  = not na(ote_buy_lo) and fvgInOTE(bFVG_UP, ote_buy_lo, ote_buy_hi)
 fvgInOTE_sell = not na(ote_sel_lo) and fvgInOTE(bFVG_DN, ote_sel_lo, ote_sel_hi)
 bool tri_long_raw  = tl_mssOk and not na(tl_obLoc) and fvgInOTE_buy  and not tl_fired
 bool tri_short_raw = ts_mssOk and not na(ts_obLoc) and fvgInOTE_sell and not ts_fired
@@ -748,11 +765,17 @@ bool tri_long  = tri_close ? (tri_long_raw  and barstate.isconfirmed) : tri_long
 bool tri_short = tri_close ? (tri_short_raw and barstate.isconfirmed) : tri_short_raw
 
 if tri_long
-    tl_fired := true
-    alert('TRINITY LONG SETUP | ' + syminfo.ticker + ' | ' + timeframe.period + 'min | OB+MSS+FVG alignés | Prix actuel: ' + str.tostring(close), alert.freq_once_per_bar)
+    tl_fired     := true
+    tl_signal_ob := tl_obLoc
+    if not na(tl_lbl)
+        tl_lbl.delete()
+    tl_lbl := label.new(bar_index, low, 'TL', style=label.style_label_up, color=color.new(color.lime,0), textcolor=color.white, size=size.small)
+    alert('TRINITY LONG SETUP | ' + syminfo.ticker + ' | ' + timeframe.period + 'min | OB+MSS+FVG alignés | Prix: ' + str.tostring(close), alert.freq_once_per_bar)
 if tri_short
-    ts_fired := true
-    alert('TRINITY SHORT SETUP | ' + syminfo.ticker + ' | ' + timeframe.period + 'min | OB+MSS+FVG alignés | Prix actuel: ' + str.tostring(close), alert.freq_once_per_bar)
-plotshape(tri_long,  title='TRINITY Long',  style=shape.triangleup,   size=size.small, location=location.belowbar, color=color.new(color.lime,0), text='TL')
-plotshape(tri_short, title='TRINITY Short', style=shape.triangledown, size=size.small, location=location.abovebar, color=color.new(color.red, 0), text='TS')
+    ts_fired     := true
+    ts_signal_ob := ts_obLoc
+    if not na(ts_lbl)
+        ts_lbl.delete()
+    ts_lbl := label.new(bar_index, high, 'TS', style=label.style_label_down, color=color.new(color.red,0), textcolor=color.white, size=size.small)
+    alert('TRINITY SHORT SETUP | ' + syminfo.ticker + ' | ' + timeframe.period + 'min | OB+MSS+FVG alignés | Prix: ' + str.tostring(close), alert.freq_once_per_bar)
 alertcondition(tri_long or tri_short, 'TRINITY Signal', message='TRINITY SIGNAL')
