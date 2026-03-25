@@ -769,13 +769,13 @@ if tri_long
     tl_signal_ob := tl_obLoc
     if not na(tl_lbl)
         tl_lbl.delete()
-    tl_lbl := label.new(bar_index, low, 'TL', style=label.style_label_up, color=color.new(color.lime,0), textcolor=color.white, size=size.small)
+    tl_lbl := label.new(tl_obLoc, tl_obBtm, 'TL', xloc=xloc.bar_time, style=label.style_label_up, color=color.new(color.lime,0), textcolor=color.white, size=size.small)
     alert('TRINITY LONG SETUP | ' + syminfo.ticker + ' | ' + timeframe.period + 'min | OB+MSS+FVG alignés | Prix: ' + str.tostring(close), alert.freq_once_per_bar)
 if tri_short
     ts_fired     := true
     ts_signal_ob := ts_obLoc
     if not na(ts_lbl)
         ts_lbl.delete()
-    ts_lbl := label.new(bar_index, high, 'TS', style=label.style_label_down, color=color.new(color.red,0), textcolor=color.white, size=size.small)
+    ts_lbl := label.new(ts_obLoc, ts_obTop, 'TS', xloc=xloc.bar_time, style=label.style_label_down, color=color.new(color.red,0), textcolor=color.white, size=size.small)
     alert('TRINITY SHORT SETUP | ' + syminfo.ticker + ' | ' + timeframe.period + 'min | OB+MSS+FVG alignés | Prix: ' + str.tostring(close), alert.freq_once_per_bar)
 alertcondition(tri_long or tri_short, 'TRINITY Signal', message='TRINITY SIGNAL')
