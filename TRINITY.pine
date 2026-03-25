@@ -731,14 +731,10 @@ else if not na(ts_oteBox)
 var bool tl_fired = false
 var bool ts_fired = false
 
-// Reset fired flag when setup changes (new OB or MSS flip)
-if mssFlippedBear or (na(activeBullOB_loc) and not na(tl_obLoc[1]))
+// Reset uniquement au flip du MSS — un seul signal par phase directionnelle
+if mssFlippedBear
     tl_fired := false
-if mssFlippedBull or (na(activeBearOB_loc) and not na(ts_obLoc[1]))
-    ts_fired := false
-if not na(activeBullOB_loc) and (na(tl_obLoc) or activeBullOB_loc != tl_obLoc)
-    tl_fired := false
-if not na(activeBearOB_loc) and (na(ts_obLoc) or activeBearOB_loc != ts_obLoc)
+if mssFlippedBull
     ts_fired := false
 
 // Signal déclenché dès que le setup est structurellement complet :
